@@ -28,7 +28,22 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->user()->usertype === 'admin') {
+        $user = $request->user();
+
+        if ($user->status !== 'approved') {
+            Auth::guard('web')->logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            $message = $user->status === 'rejected'
+                ? 'Your account has been rejected. Please contact support.'
+                : 'Your account is pending approval. Please wait for an administrator to approve it.';
+
+            return redirect()->route('login')->withErrors(['email' => $message]);
+        }
+
+        if ($user->usertype === 'admin') {
             return redirect()->intended('/admin');
         }
 

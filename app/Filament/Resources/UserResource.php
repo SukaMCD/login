@@ -17,7 +17,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
     public static function form(Form $form): Form
     {
@@ -30,14 +30,18 @@ class UserResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('password')
-                    ->password()
+                // Forms\Components\TextInput::make('password')
+                //     ->password()
+                //     ->required()
+                //     ->maxLength(255),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'approved' => 'Approved',
+                        'rejected' => 'Rejected',
+                    ])
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('usertype')
-                    ->required()
-                    ->maxLength(255)
-                    ->default('user'),
+                    ->default('pending'),
             ]);
     }
 
@@ -50,6 +54,14 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('usertype')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                        'pending' => 'warning',
+                    })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
