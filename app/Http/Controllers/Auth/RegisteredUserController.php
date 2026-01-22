@@ -43,12 +43,6 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
-
-        if ($user->usertype === 'admin') {
-            return redirect(route('admin.dashboard', absolute: false));
-        }
-
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route('login')->with('status', 'Registration successful! Your account is pending approval. Please wait for an administrator to approve it.');
     }
 }

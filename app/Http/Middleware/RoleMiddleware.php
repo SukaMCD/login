@@ -16,7 +16,11 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, $role): Response
     {
         if ($request->user() && $request->user()->usertype !== $role) {
-            abort(403, 'Unauthorized action.');
+            // Instead of aborting, redirect to the appropriate dashboard
+            if ($request->user()->usertype === 'admin') {
+                return redirect('/admin');
+            }
+            return redirect('/dashboard');
         }
 
         return $next($request);
