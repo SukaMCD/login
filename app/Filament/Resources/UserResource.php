@@ -76,10 +76,30 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('approve')
+                    ->label('Approve')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(fn(User $record) => $record->update(['status' => 'approved']))
+                    ->visible(fn(User $record): bool => $record->status !== 'approved'),
+                Tables\Actions\Action::make('reject')
+                    ->label('Reject')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(fn(User $record) => $record->update(['status' => 'rejected']))
+                    ->visible(fn(User $record): bool => $record->status !== 'rejected'),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('approve_selected')
+                        ->label('Approve Selected')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(fn(\Illuminate\Support\Collection $records) => $records->each->update(['status' => 'approved'])),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
